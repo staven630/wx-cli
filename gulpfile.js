@@ -151,7 +151,7 @@ const createPageTpl = (page, filePath, name = 'index', title = '') => {
   mkdirp.sync(pageRoot)
 
   const isComp = page === 'comp'
-  const source = isComp ? `./template/component` : `./template/page`
+  const source = isComp ? `./tpl/component` : `./tpl/page`
   createWXMLWXSS(pageRoot, name)
   const jsTpl = require(`${source}/js.js`)
   const jsPath = path.resolve(pageRoot, name + '.js')
