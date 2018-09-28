@@ -1,4 +1,4 @@
-# wxapp-boilerplate
+# wx-cli
 &emsp;&emsp;小程序脚手架，可使用scss, 字体base64化， 配置多环境变量，正式环境去console
 
 ### 配置

@@ -1,5 +1,5 @@
 {
-  "name": "staven-wx",
+  "name": "wx-cli",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
@@ -29,15 +29,15 @@
   "license": "ISC",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/staven630/wxapp-boilerplate.git"
+    "url": "git+https://github.com/staven630/wx-cli.git"
   },
   "keywords": [
     "miniprogram"
   ],
   "bugs": {
-    "url": "https://github.com/staven630/wxapp-boilerplate/issues"
+    "url": "https://github.com/staven630/wx-cli/issues"
   },
-  "homepage": "https://github.com/staven630/wxapp-boilerplate#readme",
+  "homepage": "https://github.com/staven630/wx-cli#readme",
   "description": "",
   "devDependencies": {
     "@babel/core": "^7.1.0",
