@@ -47,7 +47,6 @@ const paths = {
   page: `${src}/pages/`,
   sub: `${src}/${sub_prefix}/`,
   comp: `${src}/components/`,
-  dist_path: `${dist}`,
   src_path: `${src}/**`,
   js_path: `${src}/**/**.js`,
   json_path: `${src}/**/*.json`,
@@ -73,7 +72,7 @@ const writeJSON = function () {
   gulp
     .src(paths.json_path)
     .pipe(isBuild ? jsonminify() : through.obj())
-    .pipe(gulp.dest(paths.dist_path))
+    .pipe(gulp.dest(dist))
 };
 
 const createWXMLWXSS = (filePath, name) => {
@@ -179,7 +178,7 @@ const createPageTpl = (page, filePath, name = 'index', title = '') => {
   log(colors.red(fullPath));
   const pageRoot = path.resolve(paths[page], `${fullPath}`);
   log(colors.red(pageRoot));
-  if (fs.existsSync(path.resolve(pageRoot, name))) return log(colors.red('文件已存在'));
+  if (fs.existsSync(path.resolve(pageRoot, name + '.js'))) return log(colors.red('文件已存在'));
 
   mkdirp.sync(pageRoot) 
 
@@ -220,6 +219,19 @@ gulp.task('oss', () => {
 })
 
 
+gulp.task('appid', () => {
+  if (!envConfig.APPID) {
+    return log(colors.red('请配置appid'))
+  }
+  let projectJSON = JSON.parse(fs.readFileSync(path.resolve(src, 'project.config.json')));
+  projectJSON.appid = envConfig.APPID;
+
+  fs.writeFileSync(`${src}/project.config.json`, JSON.stringify(projectJSON, null, 2), 'utf8', (err) => {
+    if (err) throw err;
+  });
+})
+
+
 gulp.task('json', () => {
   writeJSON();
 })
@@ -237,13 +249,13 @@ gulp.task('wxml', () => {
     .pipe(preprocess({
       context: envConfig
     }))
-    .pipe(gulp.dest(paths.dist_path))
+    .pipe(gulp.dest(dist))
 })
 
 gulp.task('wxs', () => {
   return gulp
     .src(paths.wxs_path)
-    .pipe(gulp.dest(paths.dist_path))
+    .pipe(gulp.dest(dist))
 })
 
 
@@ -264,7 +276,7 @@ gulp.task('wxss', () => {
       },
       prepend: envConfig.IMAGE_URL
     }) : through.obj(),
-    gulp.dest(paths.dist_path)
+    gulp.dest(dist)
   ])
   combined.on('error', handleError)
 })
@@ -280,10 +292,8 @@ gulp.task('images', () => {
 })
 
 gulp.task('js', () => {
-  const f = filter((file) => !/(mock|bluebird)/.test(file.path));
   gulp
     .src(paths.js_path)
-    .pipe(isBuild ? f : through.obj())
     .pipe(isProd ? through.obj() : sourcemaps.init())
     .pipe(
       babel({
@@ -301,7 +311,7 @@ gulp.task('js', () => {
     .pipe(preprocess({
       context: envConfig
     }))
-    .pipe(gulp.dest(paths.dist_path))
+    .pipe(gulp.dest(dist))
 })
 
 gulp.task('watch', () => {
@@ -313,15 +323,15 @@ gulp.task('watch', () => {
 })
 
 gulp.task('clean', () => {
-  return del([`${paths.dist_path}/**`])
+  return del([`${dist}/**`])
 })
 
 gulp.task('dev', ['clean'], () => {
-  runSequence('json', 'images', 'wxml', 'wxss', 'js', 'wxs', 'oss', 'watch')
+  runSequence('appid', 'json', 'images', 'wxml', 'wxss', 'js', 'wxs', 'oss', 'watch')
 })
 
 gulp.task('build', ['clean'], () => {
-  runSequence('json', 'images', 'wxml', 'wxss', 'js', 'wxs', 'oss')  
+  runSequence('appid', 'json', 'images', 'wxml', 'wxss', 'js', 'wxs', 'oss')  
 })
 
 

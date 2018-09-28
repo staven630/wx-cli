@@ -7,13 +7,14 @@
 
 | 选项名 | 类型 | 是否必填 | 描述 |
 | :---  | :--- | :--- | :--- |
-| ENV | String | false |  不同环境的标识 |
+| NODE_ENV | String | false |  不同环境的标识 |
+| APPID | String | true |  不同环境的appid |
 | IMAGE_URL | String | false | 图片路径， 只有配置此变量才会替代wxml,css中图片路径 |
 | accessKeyId | String | false | 阿里oss accessKeyId |
 | accessKeySecret | String | false | 阿里oss accessKeySecret |
 | region | String | false | 阿里oss region |
 | bucket | String | false | 阿里oss bucket |
-| prefix | String | false | 文件上传至阿里oss的目录 |
+| prefix | String | false | 文件上传至阿里oss的目录, 应与IMAGE_URL结束路径一致 |
 
 ##### gulpfile.js配置项
 
@@ -74,3 +75,48 @@
 > gulp new --page staven --title 你好啊
 
 &emsp;&emsp;新建的json文件中，"navigationBarTitleText": "你好啊"
+
+# 多环境变量
+### 配置config
+&emsp;&emsp;config文件下的测试环境config.dev.js和正式环境config.prod.js
+```
+module.exports = {
+  IMAGE_URL: 'https://test.cn/miniprogram_test/images/'
+}
+```
+
+2、js文件
+```
+onLoad() {
+  const image = `/* @echo IMAGE_URL */`;
+}
+```
+npm run dev编译后
+```
+onLoad: function onLoad() {
+  var image = "https://test.cn/miniprogram_test/images/";
+}
+```
+
+3、wxml文件
+```
+<image mode="widthFix" src="<!-- @echo IMAGE_URL -->banner.png"></image>
+```
+npm run dev编译后
+```
+<image mode="widthFix" src="https://test.cn/miniprogram_test/images/banner.png"></image>
+```
+
+4、scss文件
+&emsp;&emsp;config文件中配置了oss所有变量，将自动替换
+```
+view {
+  background: url("../../static//images/send-question-new.svg");
+}
+```
+npm run dev编译后
+```
+View {
+  background: url("https://test.cn/miniprogram_test/images/send-question-new.svg");
+}
+```
