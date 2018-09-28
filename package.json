@@ -1,0 +1,79 @@
+{
+  "name": "staven-wx",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "server": "nodemon ./server/index.js",
+    "start": "cross-env NODE_ENV=dev gulp watch",
+    "dev": "cross-env NODE_ENV=dev gulp dev",
+    "cloud": "gulp cloud:dev",
+    "build": "cross-env NODE_ENV=prod gulp build",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "nodemonConfig": {
+    "ignore": [
+      "test/*",
+      "book/*",
+      "client/*",
+      "bin/*",
+      "node_modules",
+      "dist/*",
+      "package.json"
+    ],
+    "delay": "1000"
+  },
+  "engines": {
+    "node": ">=8"
+  },
+  "author": "staven",
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/staven630/wxapp-boilerplate.git"
+  },
+  "keywords": [
+    "miniprogram"
+  ],
+  "bugs": {
+    "url": "https://github.com/staven630/wxapp-boilerplate/issues"
+  },
+  "homepage": "https://github.com/staven630/wxapp-boilerplate#readme",
+  "description": "",
+  "devDependencies": {
+    "@babel/core": "^7.1.0",
+    "@babel/preset-env": "^7.1.0",
+    "ali-oss": "^6.0.1",
+    "ansi-colors": "^3.0.6",
+    "babel-core": "^6.26.3",
+    "babel-preset-env": "^1.7.0",
+    "cross-env": "^5.2.0",
+    "del": "^3.0.0",
+    "express": "^4.16.3",
+    "fancy-log": "^1.3.2",
+    "file-stream-rotator": "^0.3.1",
+    "gulp": "^3.9.1",
+    "gulp-babel": "^8.0.0",
+    "gulp-cssnano": "^2.1.3",
+    "gulp-filter": "^5.1.0",
+    "gulp-htmlmin": "^5.0.1",
+    "gulp-imagemin": "^4.1.0",
+    "gulp-jsonminify": "^1.1.0",
+    "gulp-modify-css-urls": "^2.0.0",
+    "gulp-postcss": "^8.0.0",
+    "gulp-preprocess": "^3.0.1",
+    "gulp-remove-logging": "^1.2.0",
+    "gulp-rename": "^1.4.0",
+    "gulp-sass": "^4.0.1",
+    "gulp-sourcemaps": "^2.6.4",
+    "gulp-uglify": "^3.0.1",
+    "minimist": "^1.2.0",
+    "mkdirp": "^0.5.1",
+    "nodemon": "^1.18.4",
+    "postcss-font-base64": "^1.0.5",
+    "postcss-px2rpx": "0.0.4",
+    "request": "^2.88.0",
+    "run-sequence": "^2.2.1",
+    "stream-combiner2": "^1.1.1",
+    "through2": "^2.0.3"
+  }
+}

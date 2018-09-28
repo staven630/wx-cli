@@ -1,0 +1,6 @@
+<view>
+   <image mode="widthFix" src="<!-- @echo IMAGE_URL -->entry-banner.svg'"></image>
+    <!-- @if ENV='prod' -->
+    <Text>Hello Dev</Text> 
+    <!-- @endif -->
+</view>
