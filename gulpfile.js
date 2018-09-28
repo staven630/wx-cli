@@ -40,13 +40,14 @@ const envConfig = isProd ? prodConfig : devConfig;
 const src = './src'
 const dist = './dist'
 const image_reg = 'static/images/';
+const sub_prefix = 'subPages'
+
 const paths = {
   app_path: `${src}/app.json`,
-  cloud_path: './server/cloud-functions',
   page: `${src}/pages/`,
-  sub: `${src}/subPages/`,
+  sub: `${src}/${sub_prefix}/`,
   comp: `${src}/components/`,
-  dist_path: './dist',
+  dist_path: `${dist}`,
   src_path: `${src}/**`,
   js_path: `${src}/**/**.js`,
   json_path: `${src}/**/*.json`,
@@ -61,7 +62,6 @@ const paths = {
 const uploadOSS = require('./oss.config')
 
 const handleError = (err) => {
-  console.log('\n')
   log(colors.red('Error!'))
   log('fileName: ' + colors.red(err.fileName))
   log('lineNumber: ' + colors.red(err.lineNumber))
@@ -78,7 +78,7 @@ const writeJSON = function () {
 
 const createWXMLWXSS = (filePath, name) => {
   fs.writeFileSync(path.resolve(filePath, name + '.wxml'), ``)
-  fs.writeFileSync(path.resolve(filePath, name + '.scss'), ``)
+  fs.writeFileSync(path.resolve(filePath,  name + '.scss'), ``)
 };
 
 const addPageJSON = (json, filePath, name) => {
@@ -92,63 +92,96 @@ const addPageJSON = (json, filePath, name) => {
       `pages/${filePath}/${name}`
     ]
   }
-  return json;
+  return {
+    json,
+    fullPath: filePath
+  };
 }
 
 const addSubPagesJSON = (json, filePathArr, name) => {
   let subRoot;
   let subPath;
   subRoot = filePathArr[0];
+  fullPath = subRoot;
   if (filePathArr.length == 1) {
     subPath = `${name}/${name}`;
+    fullPath = `${fullPath}/${name}`
   } else {
     filePathArr.shift();
-    subPath = filePathArr.join('/')
+    subPath = filePathArr.join('/');
+    fullPath = `${fullPath}/${subPath}`
+    subPath = `${subPath}/${name}`
   }
-
   if (json['subPackages']) {
     const isExist = json['subPackages'].some(item => {
-      return item.root && item.root == `subPages/${subRoot}`;
+      return item.root && item.root == `${sub_prefix}/${subRoot}`;
     });
 
     if (!isExist) {
       json['subPackages'].push({
-        "root": `"subPages/${subRoot}"`,
+        "root": `${sub_prefix}/${subRoot}`,
         "pages": [
           `${subPath}`
         ]
       });
     } else {
       json['subPackages'].map(item => {
-        if (item.root != `subPages/${subRoot}`) return item;
+        if (item.root != `${sub_prefix}/${subRoot}`) return item;
+        item.pages = item.pages || [];
+        item.pages.push(`${subPath}`);
+        item.pages = [...new Set(item.pages)]
         return {
           ...item,
-          "pages": Array.from(new Set([...json.pages, `${subPath}`]))
-        }
+          pages: item.pages
+        };
       })
     }
 
   } else {
     json['subPackages'] = [
       {
-        "root": `subPages/${subRoot}`,
+        "root": `${sub_prefix}/${subRoot}`,
         "pages": [
           `${subPath}`
         ]
       }
     ]
   }
-  return json;
+  return {
+    json,
+    fullPath
+  };
 };
 
 const createPageTpl = (page, filePath, name = 'index', title = '') => {
-  const pageRoot = path.resolve(paths[page], filePath);
   let json = JSON.parse(fs.readFileSync(paths.app_path));
   const filePathArr = filePath.split('/');
-  if (filePathArr.length < 1) return log(colors.red('文件已存在'));
-  if (fs.existsSync(pageRoot)) return log(colors.red('文件已存在'));
+  if (filePathArr.length < 1) return log(colors.red('请输入正确的参数'));
 
-  mkdirp.sync(pageRoot)
+  let fullPath = '';
+
+  if (page === 'page') {
+    const pageJSON = addPageJSON(json, filePath, name)
+    json = pageJSON.json;
+    fullPath = pageJSON.fullPath;
+  }
+
+  if (page === 'sub') {
+    const subPagesJSON  = addSubPagesJSON(json, filePathArr, name)
+    json = subPagesJSON.json;
+    fullPath = subPagesJSON.fullPath;
+  }
+
+  if (page === 'comp') {
+    fullPath = filePath;
+  }
+
+  log(colors.red(fullPath));
+  const pageRoot = path.resolve(paths[page], `${fullPath}`);
+  log(colors.red(pageRoot));
+  if (fs.existsSync(path.resolve(pageRoot, name))) return log(colors.red('文件已存在'));
+
+  mkdirp.sync(pageRoot) 
 
   const isComp = page === 'comp'
   const source = isComp ? `./tpl/component` : `./tpl/page`
@@ -160,15 +193,7 @@ const createPageTpl = (page, filePath, name = 'index', title = '') => {
   const jsonPath = path.resolve(pageRoot, name + '.json')
   fs.writeFileSync(jsonPath, typeof jsonTpl === 'function' ? jsonTpl(title) : jsonTpl)
 
-  if (page === 'page') {
-    json = addPageJSON(json, filePath, name)
-  }
-
-  if (page === 'sub') {
-    json = addSubPagesJSON(json, filePathArr, name)
-  }
-
-  fs.writeFileSync(paths.app_path, JSON.stringify(json, null, 2), 'utf8', (err) => {
+  json && fs.writeFileSync(paths.app_path, JSON.stringify(json, null, 2), 'utf8', (err) => {
     if (err) throw err;
   });
 
