@@ -120,3 +120,7 @@ View {
   background: url("https://test.cn/miniprogram_test/images/send-question-new.svg");
 }
 ```
+
+# 命令
+> npm run dev 测试环境编译
+> npm run build 正式环境编译
