@@ -125,3 +125,6 @@ View {
 > npm run dev 测试环境编译
 
 > npm run build 正式环境编译
+
+# 运行
+&emsp;&emsp;微信开发者工具打开dist目录运行
