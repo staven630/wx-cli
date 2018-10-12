@@ -24,8 +24,6 @@ const babel = require('gulp-babel')
 const uglify = require('gulp-uglify')
 const cssnano = require('gulp-cssnano')
 const runSequence = require('run-sequence')
-const sourcemaps = require('gulp-sourcemaps')
-const filter = require('gulp-filter')
 const preprocess = require('gulp-preprocess')
 const modifyCssUrls = require('gulp-modify-css-urls')
 const removeLog = require("gulp-remove-logging")
@@ -37,8 +35,8 @@ const isBuild = process.env.NODE_ENV === 'prod' || process.env.NODE_ENV === 'dev
 const isProd = process.env.NODE_ENV === 'prod'
 const envConfig = isProd ? prodConfig : devConfig;
 
-const src = './src'
-const dist = './dist'
+const src = 'src'
+const dist = 'dist'
 const image_reg = 'static/images/';
 const sub_prefix = 'subPages'
 
@@ -48,9 +46,9 @@ const paths = {
   sub: `${src}/${sub_prefix}/`,
   comp: `${src}/components/`,
   src_path: `${src}/**`,
-  js_path: `${src}/**/**.js`,
+  js_path: `${src}/**/*.js`,
   json_path: `${src}/**/*.json`,
-  wxml_path: `${src}/**/*.wxml`,
+  wxml_path: `${src}/**/*.{wxml,html}`,
   wxs_path: `${src}/**/*.wxs`,
   wxss_path: `${src}/**/*.{wxss,scss}`,
   image_path: `${src}/static/images/**`,
@@ -77,7 +75,7 @@ const writeJSON = function () {
 
 const createWXMLWXSS = (filePath, name) => {
   fs.writeFileSync(path.resolve(filePath, name + '.wxml'), ``)
-  fs.writeFileSync(path.resolve(filePath,  name + '.scss'), ``)
+  fs.writeFileSync(path.resolve(filePath, name + '.scss'), ``)
 };
 
 const addPageJSON = (json, filePath, name) => {
@@ -166,7 +164,7 @@ const createPageTpl = (page, filePath, name = 'index', title = '') => {
   }
 
   if (page === 'sub') {
-    const subPagesJSON  = addSubPagesJSON(json, filePathArr, name)
+    const subPagesJSON = addSubPagesJSON(json, filePathArr, name)
     json = subPagesJSON.json;
     fullPath = subPagesJSON.fullPath;
   }
@@ -175,12 +173,10 @@ const createPageTpl = (page, filePath, name = 'index', title = '') => {
     fullPath = filePath;
   }
 
-  log(colors.red(fullPath));
   const pageRoot = path.resolve(paths[page], `${fullPath}`);
-  log(colors.red(pageRoot));
   if (fs.existsSync(path.resolve(pageRoot, name + '.js'))) return log(colors.red('文件已存在'));
 
-  mkdirp.sync(pageRoot) 
+  mkdirp.sync(pageRoot)
 
   const isComp = page === 'comp'
   const source = isComp ? `./tpl/component` : `./tpl/page`
@@ -195,8 +191,6 @@ const createPageTpl = (page, filePath, name = 'index', title = '') => {
   json && fs.writeFileSync(paths.app_path, JSON.stringify(json, null, 2), 'utf8', (err) => {
     if (err) throw err;
   });
-
-  writeJSON();
 }
 
 const createPage = (page, options) => {
@@ -237,8 +231,7 @@ gulp.task('json', () => {
 })
 
 gulp.task('wxml', () => {
-  return gulp
-    .src(paths.wxml_path)
+  return gulp.src(paths.wxml_path)
     .pipe(
       isBuild ? htmlmin({
         collapseWhitespace: true,
@@ -257,7 +250,6 @@ gulp.task('wxs', () => {
     .src(paths.wxs_path)
     .pipe(gulp.dest(dist))
 })
-
 
 gulp.task('wxss', () => {
   const combined = combiner.obj([
@@ -279,22 +271,22 @@ gulp.task('wxss', () => {
     gulp.dest(dist)
   ])
   combined.on('error', handleError)
+
 })
 
-gulp.task('images', () => {  
+gulp.task('image', () => {
   return gulp
     .src(paths.image_path)
     .pipe(imagemin({
-			progressive: true,
-			svgoPlugins: [{removeViewBox: false}]
-		}))
+      progressive: true,
+      svgoPlugins: [{ removeViewBox: false }]
+    }))
     .pipe(gulp.dest(paths.image_dist))
 })
 
 gulp.task('js', () => {
   gulp
     .src(paths.js_path)
-    .pipe(isProd ? through.obj() : sourcemaps.init())
     .pipe(
       babel({
         presets: ['@babel/env']
@@ -307,7 +299,7 @@ gulp.task('js', () => {
         })
         : through.obj()
     )
-    .pipe(isProd ? removeLog() : sourcemaps.write('./'))
+    .pipe(isProd ? removeLog() : through.obj())
     .pipe(preprocess({
       context: envConfig
     }))
@@ -315,11 +307,9 @@ gulp.task('js', () => {
 })
 
 gulp.task('watch', () => {
-  ;['wxml', 'wxss', 'js', 'json', 'wxs'].forEach((v) => {
-    gulp.watch(`${paths.src_path}/*.${v}`, [v])
-  })
-  gulp.watch(paths.image_path, ['images'])
-  gulp.watch(paths.wxss_path, ['wxss'])
+  ['json', 'wxss', 'js', 'wxs', 'image', 'wxml'].forEach(v => {
+    gulp.watch(paths[`${v}_path`], [v]);
+  });
 })
 
 gulp.task('clean', () => {
@@ -327,11 +317,11 @@ gulp.task('clean', () => {
 })
 
 gulp.task('dev', ['clean'], () => {
-  runSequence('appid', 'json', 'images', 'wxml', 'wxss', 'js', 'wxs', 'oss', 'watch')
+  runSequence('appid', 'json', 'image', 'wxml', 'wxss', 'js', 'wxs', 'oss', 'watch')
 })
 
 gulp.task('build', ['clean'], () => {
-  runSequence('appid', 'json', 'images', 'wxml', 'wxss', 'js', 'wxs', 'oss')  
+  runSequence('appid', 'json', 'image', 'wxml', 'wxss', 'js', 'wxs', 'oss')
 })
 
 
