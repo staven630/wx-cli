@@ -1,6 +1,6 @@
-# 微信小程序 wx-cli
+# 微信小程序 miniprogram-cli
 
-> npm i -g wx-cli
+> npm i -g miniprogram-cli
 
 ### 创建
 
