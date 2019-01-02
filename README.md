@@ -1,5 +1,7 @@
 # 微信小程序 wx-cli
 
+> npm i -g wx-cli
+
 ### 创建
 
 &nbsp;&nbsp;有两种创建方式。appid 可选参数，为小程序 appId。
