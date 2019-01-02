@@ -1,130 +1,51 @@
-# wx-cli
-&emsp;&emsp;小程序脚手架，可使用scss, 字体base64化， 配置多环境变量，正式环境去console
+# 微信小程序 wx-cli
 
-### 配置
-##### config配置项
-> 配置不同环境下的变量
+### 创建
 
-| 选项名 | 类型 | 是否必填 | 描述 |
-| :---  | :--- | :--- | :--- |
-| NODE_ENV | String | false |  不同环境的标识 |
-| APPID | String | true |  不同环境的appid |
-| IMAGE_URL | String | false | 图片路径， 只有配置此变量才会替代wxml,css中图片路径 |
-| accessKeyId | String | false | 阿里oss accessKeyId |
-| accessKeySecret | String | false | 阿里oss accessKeySecret |
-| region | String | false | 阿里oss region |
-| bucket | String | false | 阿里oss bucket |
-| prefix | String | false | 文件上传至阿里oss的目录, 应与IMAGE_URL结束路径一致 |
+&nbsp;&nbsp;有两种创建方式。appid 可选参数，为小程序 appId。
 
-##### gulpfile.js配置项
+- 在目录下创建项目
 
-| 选项名 | 类型 | 是否必填 | 默认 |  描述 |
-| :---  | :--- | :--- | :--- | :--- |
-| src | String | true |  './src' | 开发目录 |
-| dist | String | true |  './dist' |打包后的目录 |
-| image_reg | String | false | 'static/images/' | 配置了config中IMAGE_URL，则要配置。开发目录下图片路径前缀 |
-| sub_prefix | String | true |  'subPages' | 分包根目录 |
+  > wx create 项目名 appid
 
-#####  gulpfile.js配置
-| 选项名 | 描述 |
-| :---  | :--- |
-| app_path |  app.json目录 |
-| page |  page目录 |
-| sub |  分包目录 |
-| comp |  components目录 |
-| src_path |  开发目录 |
-| js_path |  js目录 |
-| json_path |  json目录 |
-| wxml_path |  wxml目录 |
-| wxs_path |  wxs目录 |
-| wxss_path |  wxss目录 |
-| image_path |  图片目录 |
-| upload_path |  图片上传目录 |
+- 在项目目录里初始化项目
+  > wx init appid
 
+### 新建 page
 
-# 新建文件
-### 新建page: --page
-> gulp new --page staven
+&nbsp;&nbsp;自动在 app.json 中添加 pages 或分包路径。
+&nbsp;&nbsp;第三个参数以非 pages/开头将视为分包创建
 
-&emsp;&emsp;将在pages目录下新建staven目录，以及index.js，index.json，index.wxml，index.scss，并将路径"pages/staven/index"自动添加到app.json
+> wx new pages/demo
 
-> gulp new --page staven/login
+&nbsp;&nbsp;生成 pages/demo/index.js(scss/json/wxml)
 
-&emsp;&emsp;将在pages目录下新建staven/login目录，以及index.js，index.json，index.wxml，index.scss
+> wx new pages/demo demo
 
-### 新建分包: --sub
-> gulp new --sub staven
+&nbsp;&nbsp;生成 pages/demo/demo.js(scss/json/wxml)
 
-&emsp;&emsp;将在subPages目录下新建staven/index目录，以及index.js，index.json，index.wxml，index.scss
+> wx new subs/demo
 
-> gulp new --sub staven/hello
+&nbsp;&nbsp;生成 subs/demo/index.js(scss/json/wxml)
 
-&emsp;&emsp;将在subPages目录下新建staven/hello目录，以及index.js，index.json，index.wxml，index.scss
+> wx new subs/demo demo
 
-### 新建component: --comp
-> gulp new --comp staven
+&nbsp;&nbsp;生成 subs/demo/demo.js(scss/json/wxml)
 
-&emsp;&emsp;将在components目录下新建staven目录，以及index.js，index.json，index.wxml，index.scss
+### 新建 component
 
-### 自定义文件名: --name
-> gulp new --page staven --name demo
+> wx comp demo
 
-&emsp;&emsp;将在pages目录下新建staven目录，以及demo.js，demo.json，demo.wxml，demo.scss，并将路径"pages/staven/demo"自动添加到app.json
+### 更新配置
 
-### 自定义page页面标题: --title
-> gulp new --page staven --title 你好啊
+&nbsp;&nbsp;主要更新 gulp 配置，以及依赖
 
-&emsp;&emsp;新建的json文件中，"navigationBarTitleText": "你好啊"
+> wx update
 
-# 多环境变量
-### 配置config
-&emsp;&emsp;config文件下的测试环境config.dev.js和正式环境config.prod.js
-```
-module.exports = {
-  IMAGE_URL: 'https://test.cn/miniprogram_test/images/'
-}
-```
+### 开发
 
-2、js文件
-```
-onLoad() {
-  const image = `/* @echo IMAGE_URL */`;
-}
-```
-npm run dev编译后
-```
-onLoad: function onLoad() {
-  var image = "https://test.cn/miniprogram_test/images/";
-}
-```
+> wx serve
 
-3、wxml文件
-```
-<image mode="widthFix" src="<!-- @echo IMAGE_URL -->banner.png"></image>
-```
-npm run dev编译后
-```
-<image mode="widthFix" src="https://test.cn/miniprogram_test/images/banner.png"></image>
-```
+### 上线
 
-4、scss文件
-&emsp;&emsp;config文件中配置了oss所有变量，将自动替换
-```
-view {
-  background: url("../../static//images/send-question-new.svg");
-}
-```
-npm run dev编译后
-```
-View {
-  background: url("https://test.cn/miniprogram_test/images/send-question-new.svg");
-}
-```
-
-# 命令
-> npm run dev 测试环境编译
-
-> npm run build 正式环境编译
-
-# 运行
-&emsp;&emsp;微信开发者工具打开dist目录运行
+> wx build
