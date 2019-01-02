@@ -1,5 +1,5 @@
 {
-  "name": "miniprogram-cli",
+  "name": "@wx/cli",
   "version": "0.0.1",
   "description": "",
   "main": "index.js",
@@ -12,15 +12,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/staven630/miniprogram-cli.git"
+    "url": "git+https://github.com/staven630/wx-cli.git"
   },
   "keywords": [],
   "author": "staven (http://github.com/staven630)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/staven630/miniprogram-cli/issues"
+    "url": "https://github.com/staven630/wx-cli/issues"
   },
-  "homepage": "https://github.com/staven630/miniprogram-cli#readme",
+  "homepage": "https://github.com/staven630/wx-cli#readme",
   "dependencies": {
     "chalk": "^2.4.1",
     "commander": "^2.19.0",
