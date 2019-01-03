@@ -31,7 +31,7 @@ const copyTpl = (args, src) => {
 const initTpl = (basePATH, name, src) => {
   const jsTpl = require(`../tpls/${src}/js.js`)
   fs.writeFileSync(path.resolve(basePATH, `${name}.js`), jsTpl, 'utf8')
-  const jsonTpl = require(`../tpls/page/json.js`)
+  const jsonTpl = require(`../tpls/${src}/json.js`)
   fs.writeFileSync(path.resolve(basePATH, `${name}.json`), jsonTpl, 'utf8')
   fs.writeFileSync(path.resolve(basePATH, `${name}.scss`), '', 'utf8')
   fs.writeFileSync(path.resolve(basePATH, `${name}.wxml`), '', 'utf8')

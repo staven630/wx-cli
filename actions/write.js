@@ -13,12 +13,12 @@ const writeWxJSON = (projectName, type) => {
   Utils.createFile(Utils.resolve(root), JSON.stringify(config, null, 2))
 }
 
-const writeGulp = (projectName, type, flag = 1) => {
-  Utils.log(`开始写入gulpfile.js`)
-  const root = type === 1 ? `${projectName}/gulpfile.js` : `gulpfile.js`
+const writeGulp = (projectName, str, type, flag = 1) => {
+  Utils.log(`开始写入${str}`)
+  const root = type === 1 ? `${projectName}/${str}` : `${str}`
   Utils.createFile(
     Utils.resolve(root),
-    Utils.readFile(Utils.src('../tpls/gulpfile.js')),
+    Utils.readFile(Utils.src(`../tpls/${str}`)),
     flag,
   )
 }
@@ -63,8 +63,8 @@ const downTpl = (projectName, args, type) => {
 const writeScript = (root, msg) => {
   const dir = Utils.resolve(root ? `${root}/package.json` : `package.json`)
   let pkg = Utils.readFileJSON(dir)
-  pkg.scripts['serve'] = 'gulp serve'
-  pkg.scripts['build'] = 'gulp build'
+  pkg.scripts['serve'] = 'cross-env NODE_ENV=serve gulp serve'
+  pkg.scripts['build'] = 'cross-env NODE_ENV=build gulp build'
   Utils.createFile(dir, JSON.stringify(pkg, null, 2), 2)
   msg && Utils.log(msg)
 }
@@ -76,7 +76,8 @@ const writeScript = (root, msg) => {
  */
 const init = (projectName, args, type) => {
   writeWxJSON(projectName, type)
-  writeGulp(projectName, type)
+  writeGulp(projectName, 'gulpfile.js', type)
+  writeGulp(projectName, 'config.js', type)
   downTpl(projectName, args, type)
 }
 
