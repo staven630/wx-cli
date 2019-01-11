@@ -8,7 +8,10 @@ const base64 = require('postcss-font-base64')
 const preprocess = require('gulp-preprocess')
 const CONFIG = JSON.parse(fs.readFileSync('./wx.json'))
 const envConfig = require('./config.js')
-const context = envConfig[process.env.NODE_ENV] || envConfig.serve
+const IS_BUILD =
+  process.env.NODE_ENV === 'build' ||
+  process.env.npm_lifecycle_event === 'build'
+const context = IS_BUILD ? envConfig.build : envConfig.serve
 
 const SRCS = {
   root: `${CONFIG.clientName}`,
@@ -17,7 +20,11 @@ const SRCS = {
   wxml: [`${CONFIG.clientName}/**/*.wxml`, `${CONFIG.clientName}/**/*.wxs`],
   js: [`${CONFIG.clientName}/**/*.js`],
   json: [`${CONFIG.clientName}/**/*json`],
-  image: [`${CONFIG.clientName}/images/**.*`],
+  image: [`${CONFIG.clientName}/images/**.*`]
+}
+
+if (!IS_BUILD) {
+  SRCS.json.push(`!${CONFIG.clientName}/**/project.config.json`)
 }
 
 const wxml = () => {
@@ -25,8 +32,8 @@ const wxml = () => {
     .src(SRCS.wxml)
     .pipe(
       preprocess({
-        context: context,
-      }),
+        context: context
+      })
     )
     .pipe(gulp.dest(SRCS.dist))
 }
@@ -42,7 +49,14 @@ const wxss = () => {
 }
 
 const js = () => {
-  return gulp.src(SRCS.js).pipe(gulp.dest(SRCS.dist))
+  return gulp
+    .src(SRCS.js)
+    .pipe(
+      preprocess({
+        context: context
+      })
+    )
+    .pipe(gulp.dest(SRCS.dist))
 }
 
 const json = () => {
@@ -63,14 +77,6 @@ const watch = () => {
   gulp.watch(SRCS.js, js)
   gulp.watch(SRCS.json, json)
   gulp.watch(SRCS.image, image)
-}
-
-const setServeEnv = () => {
-  return (context = envConfig.serve)
-}
-
-const setBuildEnv = () => {
-  return (context = envConfig.build)
 }
 
 const compile = gulp.parallel(wxss, wxml, js, json, image)

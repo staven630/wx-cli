@@ -2,6 +2,8 @@
 
 > npm i -g @staven/wx-cli
 
+# 开发流程
+
 ### 创建
 
 &nbsp;&nbsp;有两种创建方式。appid 可选参数，为小程序 appId。
@@ -51,3 +53,51 @@
 ### 上线
 
 > wx build
+
+# 环境变量配置
+
+&emsp;&emsp;在项目根目录下 config.js 配置 serve(开发),build(正式)环境的变量
+
+```
+module.exports = {
+  serve: {
+    baseApi: 'https://test.com/api',
+    source: 'https://test.com/images'
+  },
+  build: {
+    baseApi: 'https://prod.com/api',
+    source: 'https://prod.com/images'
+  },
+}
+
+```
+
+### js 文件中使用环境变量
+
+```
+onLoad() {
+  const api = `/* @echo baseApi */getCityList`;
+}
+```
+
+wx build 编译后
+
+```
+onLoad: function onLoad() {
+  var api = "https://prod.com/api/getCityList";
+}
+```
+
+### wxml 文件中使用环境变量
+
+```
+<image mode="widthFix" src="<!-- @echo source -->/banner.png"></image>
+```
+
+wx build 编译后
+
+```
+onLoad: function onLoad() {
+  var image = "https://prod.com/images/banner.png";
+}
+```
