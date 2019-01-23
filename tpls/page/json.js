@@ -1,3 +1,6 @@
 module.exports = `{
-  "navigationBarTitleText": ""
+  "navigationBarTitleText": "",
+  "usingComponents": {
+    
+  }
 }`
